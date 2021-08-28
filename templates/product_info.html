@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        .checked {
+            color: orange;
+            }
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            }
+
+            body {
+            font-family: Arial,Tahoma;
+            background-color: #f7f7f7;
+            color: #636363;
+            }
+
+            img {
+            max-width: 100%;
+            height: auto;
+            } 
+            a {
+            color: #3497db;
+            text-decoration: none;
+            }
+
+            .spacer > * ~ * {
+            margin-top: 8px;
+            }
+
+            .products {
+            margin: 1.2rem auto;
+            }
+            .products_item {
+            border: 2px solid #f0f0f0;
+            box-shadow: 2px 2px 8px #f0f0f0;
+            margin: inherit;
+            padding: 12px;
+            width: 380px;
+            overflow: hidden;
+            border-radius: 4px;
+            background-color: #ffffff;
+            }
+            .products_item_label {
+            color: #2b2b2b;
+            }
+            .products_item_price {
+            margin: 8px 0;
+            }
+            .products_item_price_old {
+            font-size: small;
+            text-decoration: line-through;
+            color: #c9c9c9;
+            }
+            .products_item_price_new {
+            font-weight: bold;
+            margin-left: 6px;
+            font-size: medium;
+            text-align: right;
+            }
+            .products_item_ships {
+            background-color: #0369ad;
+            padding: 4px 8px;
+            font-weight: lighter;
+            border-radius: 4px;
+            color: #ffffff;
+            }
+            .products_item_sellers {
+            text-align: right;
+            }
+            /* Header/Logo Title */
+            h5 {
+            border-radius: 5px;
+
+            text-align: center;
+            background: #1abc9c;
+            color: white;
+            }
+            p{
+                font-size: 15px;
+            }
+            .blockquote-footer{
+                font-size: 10px;
+                text-align: right;
+            }
+        
+    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>c220</title>
+    <link rel="stylesheet" href="../static/css/styles.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- Popper JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+</head>
+<body>
+
+    <nav class="navbar navbar-light navbar-expand-md navigation-clean-search">
+        <div class="container"><a class="navbar-brand" href="{{ url_for('index') }}">ECommerce CS 220</a><button data-toggle="collapse" class="navbar-toggler" data-target="#navcol-1"><span class="sr-only">Toggle navigation</span><span
+                    class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navcol-1">
+
+
+            </div>
+        </div>
+    </nav>
+    <main>
+        <section class="products">
+            <div class="products_item spacer">
+                <div class="product_item_image">
+                    <img src='../{{info.ref}}' alt="Responsive image">
+                </div>
+                <div class="products_item_label">
+                    <h2>{{info.name}}</h2>
+                </div>
+                <div id='star_rating'>
+
+                </div>
+                <div class="products_item_desc">
+                    {{info.description}}
+                </div>
+                <div class="products_item_price">
+                    <span class="products_item_price_new">
+                        ${{info.price}}.00
+                    </span>
+                </div>
+                <h5>Customers Reviews </h5>
+
+                <div id='add_review'>
+                    <div class = "star-widget">
+                        <form id='form_review' method='POST'>
+                            <label for="vehicle1"> 1 star</label>
+                            <input type="checkbox" name="rating" value="1"><br>
+                            <label for="vehicle1"> 2 stars</label>
+                            <input type="checkbox" name="rating" value="2"><br>
+                            <label for="vehicle1"> 3 stars</label>
+                            <input type="checkbox" name="rating" value="3"><br>
+                            <label for="vehicle1"> 4 stars</label>
+                            <input type="checkbox" name="rating" value="4"><br>
+                            <label for="vehicle1"> 5 stars</label>
+                            <input type="checkbox" name="rating" value="5"><br>
+                            <input name= 'review_text_field' type=text > 
+                            <button id='review_submit_btn' type="submit" name="login" value="login" class="btn btn-primary">Add rating and review</button>
+                        </form>    
+                    </div>
+
+                </div>
+
+                <div>
+                    <div id='reviews'>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer class="footer-basic ">
+
+        <ul class="list-inline ">
+            <li class="list-inline-item "><a href="# ">Home</a></li>
+            <li class="list-inline-item "><a href="{{ url_for('contacts') }} ">Contacts</a></li>
+            <li class="list-inline-item "><a href="# ">Services</a></li>
+            <li class="list-inline-item "><a href="# ">About</a></li>
+            <li class="list-inline-item "><a href="# ">Terms</a></li>
+            <li class="list-inline-item "><a href="# ">Privacy Policy</a></li>
+        </ul>
+        <p class="copyright ">Company Name © 2020</p>
+    </footer>
+    <script>
+
+        has_user = {{ has_user|tojson }}
+        if (!has_user) {
+            document.getElementById('review_submit_btn').disabled = true;
+        }
+        document.getElementById('form_review').onsubmit = () => {
+            reviews = document.getElementById('text').value;
+            if (!reviews){
+                alert('Reviews or rating is empty')
+                return false;
+            }
+
+        }
+        ratings = '{{ratings}}'
+        console.log(ratings)
+        for (var i=0; i<ratings; i++){
+            var checkedStar = document.createElement('span');
+            checkedStar.setAttribute('class', "fa fa-star checked");
+            document.getElementById('star_rating').appendChild(checkedStar)
+        }
+
+        for (var i=ratings; i<5; i++){
+            var uncheckedStar = document.createElement('span');
+            uncheckedStar.setAttribute('class', "fa fa-star ");
+            document.getElementById('star_rating').appendChild(uncheckedStar)
+        }
+        reviews = {{reviews|tojson }}
+        console.log(reviews)
+        console.log(reviews.length)
+        if (reviews[0].length===0){
+            var noreview = document.createElement('p');
+            var text = document.createTextNode('No review');
+            noreview.appendChild(text);
+            document.getElementById('reviews').appendChild(noreview)
+        } else {
+            for (var i=0; i<reviews.length; i++){
+                var bq = document.createElement('blockquote');
+                bq.setAttribute('class', "blockquote mb-0");
+                var p = document.createElement('p');
+                var pnode = document.createTextNode(reviews[i][1]);
+                p.appendChild(pnode);
+                var ft = document.createElement('footer');
+                ft.setAttribute('class', "blockquote-footer");
+                var fnode = document.createTextNode(reviews[i][0]);
+                ft.appendChild(fnode);
+                bq.appendChild(p)
+                bq.appendChild(ft)
+                document.getElementById('reviews').appendChild(bq)
+            }
+        }
+    </script>
+</body>

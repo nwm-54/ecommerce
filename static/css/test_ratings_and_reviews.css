@@ -1,0 +1,4 @@
+.starrate span.ctrl { position:absolute; z-index:2;}
+		.starrate { color:var(--secondary); cursor:pointer}
+		.starrate.saved { color:var(--dark);}
+		.starrate:hover { color:var(--primary);} .starrate.saved:hover { color:var(--orange);}
