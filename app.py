@@ -2,7 +2,9 @@ from flask import Flask, render_template, jsonify, request, url_for, session, re
 import database as db
 from datetime import date, time, datetime,timedelta  
 import math
+import os
 import random
+import secrets
 import string
 import smtplib, ssl
 from email.mime.text import MIMEText
@@ -11,7 +13,7 @@ from email.mime.image import MIMEImage
 PORT = 3000
 app = Flask(__name__)
 app._static_folder='static/'
-app.secret_key = "super secret key"
+app.secret_key = os.environ.get("FLASK_SECRET_KEY") or secrets.token_hex(32)
 items_cart2 = []
 
 #EMAIL AND PASSWORD FOR ECOMMERCE STORE GMAIL ACCOUNT - FOR SENDING EMAIL TO CUSTOMER
@@ -193,7 +195,7 @@ def register_form():
 @app.route("/password_recovery/<string:code>", methods=['GET', 'POST'])
 def password_recovery(code):
     print('session ', session)
-    if code == session['code'] and 'email_forgot_pwd' in session:
+    if code == session.get('code') and 'email_forgot_pwd' in session:
         old_password = db.account_retrieve_password(session['email_forgot_pwd'])
         print('request method from pass recovery ', request.method)
         if request.method == "GET":
