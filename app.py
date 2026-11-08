@@ -71,7 +71,6 @@ def send_password_recovery_email(user_email):
     message = MIMEMultipart("alternative")
     message["Subject"] = "Password Recovery"
     message["From"] = sender
-    user_email = 'thanhngocnguyentuong@gmail.com'
     message["To"] = user_email
     code = id_generator(size=20)
     url = 'http://localhost:{}/password_recovery/{}'.format(PORT, code)
