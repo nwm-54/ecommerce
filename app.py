@@ -12,7 +12,6 @@ PORT = 3000
 app = Flask(__name__)
 app._static_folder='static/'
 app.secret_key = "super secret key"
-items_cart2 = []
 
 #EMAIL AND PASSWORD FOR ECOMMERCE STORE GMAIL ACCOUNT - FOR SENDING EMAIL TO CUSTOMER
 sender = 'ecommerce220.spring2021@gmail.com'
@@ -130,6 +129,7 @@ def checkout():
         order_number = id_generator()
         if request.json is not None:
             shopping_cart = request.json
+            ordered_items = []
             for item in shopping_cart:
                 item_dict = db.retrieve_products_by_name(item['name'])
                 item_dict['order_number'] = order_number
@@ -138,15 +138,14 @@ def checkout():
                 datetime_arrive = date.today() + timedelta(days=item_dict['day_to_arrive'])
                 item_dict['arrived_date'] = datetime_arrive.strftime("%m/%d/%Y")
                 item_dict['total'] = '$'+item['total']
-                global items_cart2
-                items_cart2.append(item_dict)
-            session['shopping_cart'] = items_cart2
-            db.add_orders_to_accounts(items_cart2, session['email'])
+                ordered_items.append(item_dict)
+            session['shopping_cart'] = ordered_items
+            db.add_orders_to_accounts(ordered_items, session['email'])
 
             #sending confirm email
             send_confirm_email(session['email'],session['shopping_cart'])
             return render_template("checkout.html", asd=session['shopping_cart'])
-    return render_template("checkout.html", asd=items_cart2)
+    return render_template("checkout.html", asd=session.get('shopping_cart', []))
 
 #CANCEL ORDERS
 @app.route("/cancel_orders", methods=["POST"])
