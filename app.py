@@ -130,16 +130,31 @@ def checkout():
         order_number = id_generator()
         if request.json is not None:
             shopping_cart = request.json
+            order_items = []
             for item in shopping_cart:
-                item_dict = db.retrieve_products_by_name(item['name'])
+                # The catalog price is the authority for an order line. Reject a
+                # line that does not name a catalog item or carry a positive
+                # integer count, and recompute the total from the catalog price
+                # instead of trusting the client-supplied total.
+                if not isinstance(item, dict) or not isinstance(item.get('name'), str):
+                    return 'Invalid order', 400
+                try:
+                    item_dict = db.retrieve_products_by_name(item['name'])
+                except TypeError:
+                    # The catalog lookup raises when the name matches no row.
+                    return 'Invalid order', 400
+                count = item.get('count')
+                if not isinstance(count, int) or isinstance(count, bool) or count < 1:
+                    return 'Invalid order', 400
                 item_dict['order_number'] = order_number
-                item_dict['count'] = item['count']
+                item_dict['count'] = count
                 item_dict['ordered_date'] = date.today().strftime("%m/%d/%Y")
                 datetime_arrive = date.today() + timedelta(days=item_dict['day_to_arrive'])
                 item_dict['arrived_date'] = datetime_arrive.strftime("%m/%d/%Y")
-                item_dict['total'] = '$'+item['total']
-                global items_cart2
-                items_cart2.append(item_dict)
+                item_dict['total'] = '$' + ('%.2f' % (float(item_dict['price']) * count))
+                order_items.append(item_dict)
+            global items_cart2
+            items_cart2.extend(order_items)
             session['shopping_cart'] = items_cart2
             db.add_orders_to_accounts(items_cart2, session['email'])
 
