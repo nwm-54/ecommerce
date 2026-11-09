@@ -1,4 +1,5 @@
 from flask import Flask, render_template, jsonify, request, url_for, session, redirect
+import os
 import database as db
 from datetime import date, time, datetime,timedelta  
 import math
@@ -14,9 +15,9 @@ app._static_folder='static/'
 app.secret_key = "super secret key"
 items_cart2 = []
 
-#EMAIL AND PASSWORD FOR ECOMMERCE STORE GMAIL ACCOUNT - FOR SENDING EMAIL TO CUSTOMER
-sender = 'ecommerce220.spring2021@gmail.com'
-sender_password = 'ecommerce220'
+#SENDER MAILBOX FOR THE ECOMMERCE STORE - READ FROM THE ENVIRONMENT, NOT COMMITTED
+sender = os.environ.get('ECOMMERCE_EMAIL_SENDER')
+sender_password = os.environ.get('ECOMMERCE_EMAIL_PASSWORD')
 
 #IMPLEMENT INDEX PAGE
 @app.route("/", methods=["GET","POST"])
