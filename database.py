@@ -1,10 +1,11 @@
 import sqlite3
+from werkzeug.security import generate_password_hash, check_password_hash
 
 #add new account to accounts table
 def add_account(email, password):
     conn = sqlite3.connect('ecommerce.db')
     c = conn.cursor()
-    c.execute("INSERT INTO accounts VALUES (?,?,?)",(email, password,''))
+    c.execute("INSERT INTO accounts VALUES (?,?,?)",(email, generate_password_hash(password),''))
     conn.commit()
     conn.close()
 def account_retrieve_password(email):
@@ -13,8 +14,15 @@ def account_retrieve_password(email):
     pw = c.execute("SELECT password FROM accounts WHERE email=(?)",(email,)).fetchone()
     conn.commit()
     conn.close()
-    print('retrieve password ', pw[0])
+    if pw is None:
+        return None
     return pw[0]
+#Return True when the password matches the salted hash stored for this email
+def verify_account(email, password):
+    stored = account_retrieve_password(email)
+    if stored is None:
+        return False
+    return check_password_hash(stored, password)
 #Check if registered email is already exist - cannot have duplicate email in database
 def account_check_exist(email):
     conn = sqlite3.connect('ecommerce.db')
@@ -27,7 +35,7 @@ def account_check_exist(email):
 def account_update_password(email, new_password):
     conn = sqlite3.connect('ecommerce.db')
     c = conn.cursor()
-    c.execute("UPDATE accounts SET password=(?) WHERE email=(?)",(new_password, email))
+    c.execute("UPDATE accounts SET password=(?) WHERE email=(?)",(generate_password_hash(new_password), email))
     conn.commit()
     conn.close()
 def cancel_orders_from_accounts(email, order_number, item_id):
@@ -190,3 +198,46 @@ def get_ratings_reviews_by_id(id):
         rating_sum += re[-2]
         reviews.append([re[-3].split('@')[0], re[-1]])
     return rating_sum/len(value), reviews
+
+
+#Return True when the value is a werkzeug password hash, not a clear-text password
+def _is_password_hash(value):
+    return value.split(':', 1)[0] in ('pbkdf2', 'scrypt')
+
+#Create the tables and seed the product catalog when the database is new.
+#No account row is seeded, so the repository holds no account password.
+def init_db():
+    conn = sqlite3.connect('ecommerce.db')
+    c = conn.cursor()
+    c.execute("""CREATE TABLE IF NOT EXISTS accounts(
+        email VARCHAR PRIMARY KEY,
+        password VARCHAR NOT NULL,
+        orders VARCHAR)""")
+    c.execute("""CREATE TABLE IF NOT EXISTS items(
+        id int PRIMARY KEY,
+        name VARCHAR NOT NULL,
+        description VARCHAR,
+        ref VARCHAR,
+        price VARCHAR NOT NULL,
+        day_to_arrive INTERGER NOT NULL)""")
+    c.execute("""CREATE TABLE IF NOT EXISTS ratings_reviews(
+        id int PRIMARY KEY,
+        product_id int NOT NULL,
+        account_email VARCHAR NOT NULL,
+        rating INTEGER NOT NULL,
+        review VARCHAR NOT NULL)""")
+    if c.execute("SELECT COUNT(*) FROM items").fetchone()[0] == 0:
+        c.executemany("INSERT INTO items (id,name,description,ref,price,day_to_arrive) VALUES(?,?,?,?,?,?)", [
+            (1, 'Cap', 'A baseball cap', 'static/img/products/hat.jpg', 15, 3),
+            (2, 'Hoodies', 'A black hooldies', 'static/img/products/hoodies.jpg', 35, 4),
+            (3, 'T-shirt', 'A white shirt', 'static/img/products/tshirt.jpg', 20, 5),
+            (4, 'Shoes', 'A pair of shoes', 'static/img/products/shoes.jpg', 70, 6),
+        ])
+    #Move any clear-text password written by an older version to a salted hash
+    for email, password in c.execute("SELECT email, password FROM accounts").fetchall():
+        if not _is_password_hash(password):
+            c.execute("UPDATE accounts SET password=(?) WHERE email=(?)", (generate_password_hash(password), email))
+    conn.commit()
+    conn.close()
+
+init_db()

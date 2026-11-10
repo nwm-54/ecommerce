@@ -194,16 +194,20 @@ def register_form():
 def password_recovery(code):
     print('session ', session)
     if code == session['code'] and 'email_forgot_pwd' in session:
-        old_password = db.account_retrieve_password(session['email_forgot_pwd'])
+        email = session['email_forgot_pwd']
         print('request method from pass recovery ', request.method)
         if request.method == "GET":
-            return render_template('password_reset.html', user_email=session['email_forgot_pwd'], old_password=old_password)
+            return render_template('password_reset.html', user_email=email, message='')
         # else:#if request.method =='POST':
         new_password = request.form.get("password")
-        db.account_update_password(session['email_forgot_pwd'], new_password)
-        print('password upate from {} to {}'.format(old_password, new_password))
+        if not new_password:
+            return render_template('password_reset.html', user_email=email, message='missing_info')
+        if db.verify_account(email, new_password):
+            return render_template('password_reset.html', user_email=email, message='same_password')
+        db.account_update_password(email, new_password)
+        print('password updated for {}'.format(email))
         print(session['email']+' login successfully')
-        session['email'] = session['email_forgot_pwd']
+        session['email'] = email
         session['login_status'] = True
         return redirect(url_for('index',products=session['all_products'] ))
     return render_template('forgot_password.html', message='Error')
@@ -216,11 +220,11 @@ def login_form():
         if 'login' in request.form:
             print('in login')
             password_inp = request.form.get("password")
-            email_check, password_check = db.retrieve_account(email_inp, password_inp)
+            email_check, _ = db.retrieve_account(email_inp, password_inp)
 
             if len(email_inp)==0 or len(password_inp)==0:
                 return render_template("login.html", message="missing_info")
-            elif email_check == email_inp and password_check == password_inp: 
+            elif email_check == email_inp and db.verify_account(email_inp, password_inp): 
                 session['email'] = email_inp
                 session['login_status'] = True
                 print('login successfully')
